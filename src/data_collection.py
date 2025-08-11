@@ -1,4 +1,5 @@
 # NBA Data Collection Script
+# This script fetches basic NBA player data and saves it to CSV
 
 import pandas as pd
 from nba_api.stats.static import players
@@ -15,13 +16,34 @@ def get_all_players():
     return players_df
 
 def get_sample_player_stats():
-    """Get career stats for a few star players (for testing)"""
+    """Get career stats for a diverse set of current and recent players"""
+    # Expanded list with different eras, positions, and playing styles
     star_players = {
+        # Current Superstars
         'LeBron James': 2544,
         'Stephen Curry': 201939,
         'Kevin Durant': 201142,
         'Giannis Antetokounmpo': 203507,
-        'Luka Doncic': 1629029
+        'Luka Doncic': 1629029,
+        'Nikola Jokic': 203999,
+        'Joel Embiid': 203954,
+        'Jayson Tatum': 1628369,
+        
+        # Recent Legends
+        'Kobe Bryant': 977,
+        'Tim Duncan': 1495,
+        'Dirk Nowitzki': 1717,
+        'Chris Paul': 101108,
+        'Kawhi Leonard': 202695,
+        'Russell Westbrook': 201566,
+        
+        # Rising Stars & Different Positions
+        'Anthony Edwards': 1630162,
+        'Ja Morant': 1629630,
+        'Zion Williamson': 1629627,
+        'Damian Lillard': 203081,
+        'Jimmy Butler': 202710,
+        'Paul George': 202331
     }
     
     all_stats = []
@@ -37,7 +59,7 @@ def get_sample_player_stats():
             stats_df['PLAYER_NAME'] = name
             all_stats.append(stats_df)
             
-            # wait a bit between requests
+            # Be nice to the API - wait a bit between requests
             time.sleep(1)
             
         except Exception as e:
