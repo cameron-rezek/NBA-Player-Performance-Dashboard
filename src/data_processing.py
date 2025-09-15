@@ -74,9 +74,7 @@ def add_performance_categories(df):
     return df
 
 def create_career_summary(df):
-    """Create career summary statistics"""
-    print("Creating career summaries...")
-    
+    # Aggregate career-level totals and averages
     career_stats = df.groupby('PLAYER_NAME').agg({
         'SEASON_ID': 'count',  # Number of seasons
         'GP': 'sum',           # Total games
@@ -87,11 +85,34 @@ def create_career_summary(df):
         'TS_PCT': 'mean',      # Average shooting efficiency
         'EFFICIENCY': 'mean'   # Average efficiency
     }).round(2)
-    
-    career_stats.columns = ['SEASONS', 'TOTAL_GAMES', 'TOTAL_PTS', 
-                           'CAREER_PPG', 'CAREER_RPG', 'CAREER_APG', 
-                           'CAREER_TS_PCT', 'CAREER_EFFICIENCY']
-    
+
+    career_stats.columns = [
+        'SEASONS',
+        'TOTAL_GAMES',
+        'TOTAL_PTS',
+        'CAREER_PPG',
+        'CAREER_RPG',
+        'CAREER_APG',
+        'CAREER_TS_PCT',
+        'CAREER_EFFICIENCY',
+    ]
+
+    # Compute each player's PPG in their most recent season.
+    df_tmp = df.copy()
+    df_tmp['SEASON_YEAR'] = df_tmp['SEASON_ID'].str[:4].astype(int)
+    latest_season_mask = (
+        df_tmp.groupby('PLAYER_NAME')['SEASON_YEAR'].transform('max')
+        == df_tmp['SEASON_YEAR']
+    )
+    latest_ppg = (
+        df_tmp[latest_season_mask]
+        .groupby('PLAYER_NAME')['PPG']
+        .mean()
+        .rename('LATEST_PPG')
+    )
+    # Join the latest PPG onto the career summary (NaN if no recent season)
+    career_stats = career_stats.join(latest_ppg)
+
     return career_stats
 
 def main():
